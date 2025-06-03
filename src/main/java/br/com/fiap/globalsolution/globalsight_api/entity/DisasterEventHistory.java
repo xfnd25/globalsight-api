@@ -121,4 +121,10 @@ public class DisasterEventHistory {
 
     @Column(name = "river_basin", columnDefinition = "TEXT")
     private String riverBasin;
+
+    @Column(name = "coordinate_x")
+    private Double coordinateX;
+
+    @Column(name = "coordinate_z")
+    private Double coordinateZ;
 }

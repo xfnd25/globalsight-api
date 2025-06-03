@@ -3,6 +3,8 @@ package br.com.fiap.globalsolution.globalsight_api.config;
 import br.com.fiap.globalsolution.globalsight_api.exception.GlobalExceptionHandler;
 import br.com.fiap.globalsolution.globalsight_api.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,14 +23,16 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
+// import java.util.List; // Not strictly needed if ApiErrorResponse handles null details
+
 
 @Configuration
 @EnableWebSecurity
@@ -36,26 +40,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ObjectMapper objectMapper; // Para escrever a resposta de erro JSON
-
-    // DTO interno para a resposta de erro padronizada, movido para cá para encapsulamento
-    // ou pode ser movido para uma classe separada no pacote exception se preferir.
-    public record ApiErrorResponse(
-            LocalDateTime timestamp,
-            int status,
-            String error,
-            String message,
-            String path,
-            List<String> details
-    ) {
-        public ApiErrorResponse(HttpStatus httpStatus, String message, String path, List<String> details) {
-            this(LocalDateTime.now(), httpStatus.value(), httpStatus.getReasonPhrase(), message, path, details);
-        }
-        public ApiErrorResponse(HttpStatus httpStatus, String message, String path) {
-            this(LocalDateTime.now(), httpStatus.value(), httpStatus.getReasonPhrase(), message, path, null);
-        }
-    }
-
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, ObjectMapper objectMapper) {
@@ -76,62 +61,49 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable) // Desabilita CSRF pois usaremos JWT (API stateless)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configuração de CORS
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // API Stateless
                 .authorizeHttpRequests(authorize -> authorize
                         // Endpoints públicos
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
-                                "/api/swagger-ui/**",
-                                "/api/v1/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**", // Adicionado para cobrir recursos da UI do Swagger
-                                "/v3/api-docs/**"  // Adicionado para cobrir recursos da especificação OpenAPI v3
-                        ).permitAll()
+                        .requestMatchers("/api/swagger-ui/**", "/api/v1/api-docs/**", "/swagger-ui.html").permitAll()
+                        // .requestMatchers(HttpMethod.GET, "/api/disasters/history/**").permitAll() // Ex: Se histórico for público
 
-                        // Endpoints que requerem autenticação
+                        // Endpoints que requerem autenticação (ou roles específicas com @PreAuthorize nos controllers)
                         .requestMatchers("/api/simulations/**").authenticated()
                         .requestMatchers("/api/drone/**").authenticated()
-
                         .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("USER") // Exemplo: só ADMIN pode criar histórico
                         .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("USER")   // Exemplo: só ADMIN pode atualizar histórico
                         .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("USER")// Exemplo: só ADMIN pode deletar histórico
-                                       
-                        // Permitindo que qualquer usuário AUTENTICADO realize CRUD em /api/history
-                        .requestMatchers(HttpMethod.POST, "/api/history/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/history/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/history/**").authenticated() // Leitura também requer autenticação
                         .anyRequest().authenticated() // Todas as outras requisições precisam de autenticação
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            // Usando o record ApiErrorResponse definido nesta classe
-                            ApiErrorResponse errorResponse = new ApiErrorResponse(
+                            GlobalExceptionHandler.ApiErrorResponse errorResponse = new GlobalExceptionHandler.ApiErrorResponse(
                                     HttpStatus.UNAUTHORIZED,
                                     "Autenticação necessária. Faça login para acessar este recurso.",
                                     request.getRequestURI(),
-                                    null
+                                    null // No details list for this one
                             );
                             objectMapper.writeValue(response.getOutputStream(), errorResponse);
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            // Usando o record ApiErrorResponse definido nesta classe
-                            ApiErrorResponse errorResponse = new ApiErrorResponse(
+                            GlobalExceptionHandler.ApiErrorResponse errorResponse = new GlobalExceptionHandler.ApiErrorResponse(
                                     HttpStatus.FORBIDDEN,
                                     "Acesso negado. Você não tem permissão para acessar este recurso.",
                                     request.getRequestURI(),
-                                    null
+                                    null // No details list for this one
                             );
                             objectMapper.writeValue(response.getOutputStream(), errorResponse);
                         })
                 );
 
+        // Adiciona o filtro JWT antes do filtro de autenticação padrão do Spring
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -140,15 +112,13 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Em produção, especifique as origens permitidas em vez de "*"
-        configuration.addAllowedOriginPattern("*"); // Ex: "http://localhost:3000" para um frontend React local
-        configuration.addAllowedMethod("*"); // Ou especifique métodos: "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        configuration.addAllowedHeader("*"); // Ou especifique cabeçalhos: "Authorization", "Content-Type"
-        configuration.setAllowCredentials(true);
-        // configuration.setMaxAge(3600L); // Opcional: tempo de cache para pre-flight requests
+        configuration.addAllowedOriginPattern("*"); // Permite todas as origens (para desenvolvimento). Em produção, restrinja!
+        configuration.addAllowedMethod("*"); // Permite todos os métodos HTTP
+        configuration.addAllowedHeader("*"); // Permite todos os cabeçalhos
+        configuration.setAllowCredentials(true); // Permite credenciais (cookies, authorization headers)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // Aplica para todos os caminhos
         return source;
     }
 }
