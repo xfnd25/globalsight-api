@@ -1,7 +1,8 @@
 package br.com.fiap.globalsolution.globalsight_api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Data; // Pode manter se outros métodos estiverem funcionando
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.List;
@@ -26,7 +27,10 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    // Getter adicionado manualmente
+
+    @Getter
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -34,6 +38,7 @@ public class User {
     )
     private List<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SimulatedDisasterResponse> simulations;
+
 }

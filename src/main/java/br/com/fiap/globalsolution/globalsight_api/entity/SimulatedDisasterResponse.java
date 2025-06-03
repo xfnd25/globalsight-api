@@ -19,30 +19,17 @@ public class SimulatedDisasterResponse {
     private Long id;
 
     // --- Características Base do Desastre (Input do Usuário/App) ---
-    // Estas são as informações que o serviço de IA Python usará para
-    // recriar todas as features necessárias para o modelo.
+    // Campos que serão enviados para a API Python.
+    // Removi @NotNull da maioria, assumindo que a API Python/modelo fará imputação
+    // ou que a validação no DTO será mais específica.
 
-    @NotNull
     private Integer inputYear;
-
-    @NotNull
     private Integer inputStartMonth;
-
-    // Para calcular DisasterDurationDays, precisamos das datas de início e fim completas
-    // ou da duração já calculada. Vamos pedir os componentes da data.
-    @NotNull
     private Integer inputStartDay;
-
-    @NotNull
     private Integer inputEndYear;
-
-    @NotNull
     private Integer inputEndMonth;
-
-    @NotNull
     private Integer inputEndDay;
 
-    // Features Categóricas Base
     @Column(length = 100)
     private String inputDisasterGroup;
 
@@ -50,7 +37,7 @@ public class SimulatedDisasterResponse {
     private String inputDisasterSubgroup;
 
     @Column(length = 100)
-    private String inputDisasterType;
+    private String inputDisasterType; // Provavelmente um dos campos mais importantes
 
     @Column(length = 100)
     private String inputContinent;
@@ -59,38 +46,43 @@ public class SimulatedDisasterResponse {
     private String inputRegion;
 
     @Column(length = 50)
-    private String inputDisMagScale; // Usuário informa a escala original
+    private String inputDisMagScale;
 
-    // Features Numéricas Base
-    private Double inputDisMagValue; // Usuário informa o valor da magnitude (pode ser nulo)
+    private Double inputDisMagValue;
 
-    @NotNull
-    private Double inputLatitude; // Coordenada X para o drone e feature para IA
+    // Coordenadas são essenciais para o drone e podem ser para o modelo
+    @NotNull // Mantendo NotNull aqui pois são cruciais
+    private Double inputLatitude;
 
-    @NotNull
-    private Double inputLongitude; // Coordenada Y para o drone e feature para IA
+    @NotNull // Mantendo NotNull aqui pois são cruciais
+    private Double inputLongitude;
 
     private Double inputCpi;
 
-    // A API Java NÃO precisará enviar as features DMV_*, DisMagValue_IsMissing,
-    // DisasterDurationDays (calculada), nem as features de interação, nem as OHE.
-    // O serviço Python de IA fará essa engenharia a partir dos inputs base acima.
-
     // --- Resultado da Predição da IA (retornado pelo serviço Python) ---
     @Column(length = 100)
-    private String predictedFatalitiesCategory; // Ex: "3_Alta (101-1000)"
+    private String predictedFatalitiesCategory;
+    private LocalDateTime iaPredictionTimestamp; // Quando a predição foi recebida
 
     // --- Detalhes da Simulação da Resposta do Drone (definidos pela API Java após a predição) ---
     private Integer simulatedDronesDeployed;
 
-    @Lob
+    @Lob // Para textos potencialmente longos
     @Column(columnDefinition = "TEXT")
-    private String simulatedDroneTasks; // Ex: "Roteamento de internet, Mapeamento da área, Medição de CO2"
+    private String simulatedDroneTasks;
 
+    // --- Metadados da Requisição e Status ---
     @Column(nullable = false)
-    private LocalDateTime requestTimestamp;
+    private LocalDateTime requestTimestamp; // Quando a simulação foi criada na API Java
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private SimulationStatus status;
+
+    @Column(columnDefinition = "TEXT")
+    private String errorMessage; // Para armazenar mensagens de erro (ex: da IA)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false) // Uma simulação deve pertencer a um usuário
     private User user;
 }
