@@ -73,9 +73,9 @@ public class SecurityConfig {
                         // Endpoints que requerem autenticação (ou roles específicas com @PreAuthorize nos controllers)
                         .requestMatchers("/api/simulations/**").authenticated()
                         .requestMatchers("/api/drone/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("ADMIN") // Exemplo: só ADMIN pode criar histórico
-                        .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("ADMIN")   // Exemplo: só ADMIN pode atualizar histórico
-                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("ADMIN")// Exemplo: só ADMIN pode deletar histórico
+                        .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("USER") // Exemplo: só ADMIN pode criar histórico
+                        .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("USER")   // Exemplo: só ADMIN pode atualizar histórico
+                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("USER")// Exemplo: só ADMIN pode deletar histórico
                         .anyRequest().authenticated() // Todas as outras requisições precisam de autenticação
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

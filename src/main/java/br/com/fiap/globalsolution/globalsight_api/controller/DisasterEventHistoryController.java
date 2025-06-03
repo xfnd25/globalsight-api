@@ -35,7 +35,7 @@ public class DisasterEventHistoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')") // Apenas ADMIN pode criar novos registros históricos
+    @PreAuthorize("hasRole('USER')") // Apenas ADMIN pode criar novos registros históricos
     @Operation(summary = "Cria um novo evento histórico de desastre",
             description = "Adiciona um novo registro ao histórico de desastres. Requer papel ADMIN.")
     @ApiResponses(value = {
@@ -79,7 +79,7 @@ public class DisasterEventHistoryController {
     }
 
     @PutMapping("/{disNo}")
-    @PreAuthorize("hasRole('ADMIN')") // Apenas ADMIN pode atualizar registros históricos
+    @PreAuthorize("hasRole('USER')") // Apenas ADMIN pode atualizar registros históricos
     @Operation(summary = "Atualiza um evento histórico de desastre",
             description = "Atualiza os dados de um evento histórico existente. Requer papel ADMIN.")
     @ApiResponses(value = {
@@ -99,7 +99,7 @@ public class DisasterEventHistoryController {
     }
 
     @DeleteMapping("/{disNo}")
-    @PreAuthorize("hasRole('ADMIN')") // Apenas ADMIN pode deletar registros históricos
+    @PreAuthorize("hasRole('USER')") // Apenas ADMIN pode deletar registros históricos
     @Operation(summary = "Deleta um evento histórico de desastre",
             description = "Remove um evento histórico do sistema. Requer papel ADMIN.")
     @ApiResponses(value = {
