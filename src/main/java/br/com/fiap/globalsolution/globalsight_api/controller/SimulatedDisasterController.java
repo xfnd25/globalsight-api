@@ -104,7 +104,7 @@ public class SimulatedDisasterController {
     }
 
     @GetMapping("/admin/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Lista todas as simulações de desastre (Admin)",
             description = "Retorna uma lista paginada de todas as simulações no sistema, com filtros opcionais. Requer papel ADMIN.")
     public ResponseEntity<Page<SimulatedDisasterResponseDto>> getAllSimulationsForAdmin(

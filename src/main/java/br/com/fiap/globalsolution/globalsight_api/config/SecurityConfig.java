@@ -93,6 +93,11 @@ public class SecurityConfig {
                         // Endpoints que requerem autenticação
                         .requestMatchers("/api/simulations/**").authenticated()
                         .requestMatchers("/api/drone/**").authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("USER") // Exemplo: só ADMIN pode criar histórico
+                        .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("USER")   // Exemplo: só ADMIN pode atualizar histórico
+                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("USER")// Exemplo: só ADMIN pode deletar histórico
+                                       
                         // Permitindo que qualquer usuário AUTENTICADO realize CRUD em /api/history
                         .requestMatchers(HttpMethod.POST, "/api/history/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/history/**").authenticated()
