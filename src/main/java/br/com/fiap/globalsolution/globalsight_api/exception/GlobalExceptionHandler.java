@@ -98,6 +98,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException ex, jakarta.servlet.http.HttpServletRequest request) {
+        logger.warn("Operação ilegal ou estado inválido: {} para o path: {}", ex.getMessage(), request.getRequestURI());
+        ApiErrorResponse errorResponse = new ApiErrorResponse(
+                HttpStatus.BAD_REQUEST, // Or CONFLICT (409) depending on typical use of IllegalStateException
+                ex.getMessage(), // Use the specific message from the exception
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, jakarta.servlet.http.HttpServletRequest request) {
         logger.warn("Erro de validação: {} para o path: {}", ex.getMessage(), request.getRequestURI());
