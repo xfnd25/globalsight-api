@@ -47,4 +47,6 @@ public class DisasterEventHistoryDto {
     private Double aidContribution;
     private String localTime;
     private String riverBasin;
+    private Double coordinateX;
+    private Double coordinateZ;
 }

@@ -156,6 +156,8 @@ Os tokens JWT possuem um tempo de expiração. Nesta API, conforme configurado e
       "longitude": "120.7 E",
       "localTime": "10:30",
       "riverBasin": null,
+      "coordinateX": 123.45,
+      "coordinateZ": 678.90,
       "startYear": 2023,
       "startMonth": 3,
       "startDay": 15,
@@ -716,8 +718,8 @@ A GlobalSight API fornece endpoints para gerenciar e simular eventos de desastre
 
 *   **Resumo:** Cria um novo evento histórico de desastre
 *   **Descrição:** Adiciona um novo registro ao histórico de desastres. Requer papel ADMIN.
-*   **Segurança:** `bearerAuth`, `ROLE_ADMIN`
-*   **Corpo da Requisição:** `DisasterEventHistoryDto` (detalhes dos campos dependem da definição do DTO)
+    *   **Segurança:** Requer autenticação JWT e papel `ROLE_USER`.
+    *   **Corpo da Requisição:** `DisasterEventHistoryDto` (inclui campos como `disNo`, `yearEvent`, `disasterGroup`, `country`, `totalDeaths`, `coordinateX`, `coordinateZ`, etc. Detalhes completos na definição do DTO.)
 *   **Exemplo de Requisição:**
     ```json
     {
@@ -868,7 +870,7 @@ A GlobalSight API fornece endpoints para gerenciar e simular eventos de desastre
 
 *   **Resumo:** Atualiza um evento histórico de desastre
 *   **Descrição:** Atualiza os dados de um evento histórico existente. Requer papel ADMIN.
-*   **Segurança:** `bearerAuth`, `ROLE_ADMIN`
+    *   **Segurança:** Requer autenticação JWT e papel `ROLE_USER`.
 *   **Parâmetros de Caminho:**
     *   `disNo` (string, obrigatório): DisNo (ID EMDAT) do evento a ser atualizado.
 *   **Corpo da Requisição:** `DisasterEventHistoryDto`
@@ -909,7 +911,7 @@ A GlobalSight API fornece endpoints para gerenciar e simular eventos de desastre
 
 *   **Resumo:** Deleta um evento histórico de desastre
 *   **Descrição:** Remove um evento histórico do sistema. Requer papel ADMIN.
-*   **Segurança:** `bearerAuth`, `ROLE_ADMIN`
+    *   **Segurança:** Requer autenticação JWT e papel `ROLE_USER`.
 *   **Parâmetros de Caminho:**
     *   `disNo` (string, obrigatório): DisNo (ID EMDAT) do evento a ser deletado.
 *   **Exemplo de Requisição (Caminho):** `/api/history/2023-0001-PHL`
@@ -1172,7 +1174,7 @@ Este exemplo representa um evento de seca prolongada na África Oriental. Note q
 
 *   **Resumo:** Lista todas as simulações de desastre (Admin)
 *   **Descrição:** Retorna uma lista paginada de todas as simulações no sistema, com filtros opcionais. Requer papel ADMIN.
-*   **Segurança:** `bearerAuth`, `ROLE_ADMIN`
+    *   **Segurança:** Requer autenticação JWT e papel `ROLE_USER`.
 *   **Parâmetros de Query (Pageable):**
     *   `page` (integer, opcional, padrão: 0)
     *   `size` (integer, opcional, padrão: 10)
