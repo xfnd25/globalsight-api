@@ -8,10 +8,8 @@ WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 
-# Download dependencies (this layer will be cached unless pom.xml changes)
-# RUN ./mvnw dependency:go-offline -B
-# Skipping go-offline for now as it can sometimes cause issues in simpler setups
-# and the full build will download them anyway.
+# Optional: Download dependencies to leverage Docker cache better
+# RUN chmod +x ./mvnw && ./mvnw dependency:go-offline -B
 
 # Copy the rest of the application code
 COPY src ./src
@@ -20,10 +18,10 @@ COPY src ./src
 # Ensure mvnw is executable
 RUN chmod +x ./mvnw && ./mvnw package -DskipTests
 
-# Argument to specify the JAR file name (useful if version changes)
-ARG JAR_FILE=target/*.jar
+# Specify the exact JAR file name (replace if your version/artifactId changes)
+ARG JAR_FILE=target/globalsight-api-0.0.1-SNAPSHOT.jar
 
-# Copy the JAR file from the build stage to the current directory in the container
+# Copy the specific JAR file to application.jar
 COPY ${JAR_FILE} application.jar
 
 # Expose the port the application runs on
