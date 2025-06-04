@@ -1,3 +1,7 @@
+docker volume create mysql_data
+
+docker run -d --name mysql-container -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 mysql:8.0
+
 az login
 
 az group create --name rg-vmubuntu --location eastus
