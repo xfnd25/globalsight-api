@@ -16,6 +16,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +73,7 @@ public class DisasterEventHistoryController {
     @Operation(summary = "Lista eventos históricos de desastre",
             description = "Retorna uma lista paginada de eventos históricos, com filtros opcionais.")
     public ResponseEntity<Page<DisasterEventHistoryDto>> getAllHistoryEvents(
-            @ParameterObject @PageableDefault(size = 10, sort = "yearEvent,desc") Pageable pageable,
+            @ParameterObject @PageableDefault(size = 10, sort = "yearEvent", direction = Sort.Direction.DESC) Pageable pageable,
             @ParameterObject DisasterEventHistoryFilterDto filterDto) {
         Page<DisasterEventHistoryDto> events = historyService.getAllHistoryEvents(pageable, filterDto);
         return ResponseEntity.ok(events);
