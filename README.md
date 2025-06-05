@@ -6,7 +6,7 @@ A GlobalSight API fornece endpoints para gerenciar e simular eventos de desastre
 
 **Observação sobre Endpoints de Documentação:** Os endpoints da Swagger UI (`/api/swagger-ui/**`) e da especificação OpenAPI (`/api/v1/api-docs/**`) são públicos e não requerem autenticação.
 
-**Grupo** [**RM555317** - Fernando Pacheco] # [**RM556814** - Guilherme Jardim]
+**Grupo** **[RM555317 - Fernando Pacheco]** **[RM556814 - Guilherme Jardim]**
 
 ## Autenticação JWT
 
