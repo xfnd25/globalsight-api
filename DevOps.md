@@ -45,8 +45,6 @@ sudo docker login
 
 docker network create globalsight-network 
 
-workdir 
-
 docker run -d --name mysql-container --network globalsight-network -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 mysql:8.0
 
 docker run -d --name globalsight-api --network globalsight-network -p 8080:8080 xfnd25/globalsight-api:1.2
@@ -55,7 +53,6 @@ docker ps
 
 docker exec -it mysql-container mysql -uusuario -psenha123 meu_banco
 show tables;
-select * from nome_tabela;
 
 docker logs -f mysql-container
 
