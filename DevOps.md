@@ -2,7 +2,9 @@ docker volume create mysql_data
 
 docker network create globalsight-network #NÃO NECESSARIO, NA MESMA REDE
 
-docker run -d --name mysql-container --network globalsight-network -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 mysql:8.0
+--network globalsight-network
+
+docker run -d --name mysql-container -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 xfnd25/mysql:8.1
 
 docker build --no-cache -t globalsight-api:1.2 .
 
