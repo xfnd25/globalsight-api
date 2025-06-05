@@ -1,9 +1,3 @@
-docker network create globalsight-network 
-
-docker run -d --name mysql-container --network globalsight-network -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 xfnd25/mysql:8.1
-
-docker run -d --name globalsight-api --network globalsight-network -p 8080:8080 globalsight-api:1.2
-
 az login
 
 az group create --name rg-vmubuntu --location eastus
