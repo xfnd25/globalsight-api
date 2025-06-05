@@ -41,8 +41,6 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 
 sudo docker version
 
-sudo docker login
-
 docker network create globalsight-network 
 
 docker run -d --name mysql-container --network globalsight-network -e MYSQL_ROOT_PASSWORD=senhaSegura123 -e MYSQL_DATABASE=meu_banco -e MYSQL_USER=usuario -e MYSQL_PASSWORD=senha123 -v mysql_data:/var/lib/mysql -p 3306:3306 mysql:8.0
