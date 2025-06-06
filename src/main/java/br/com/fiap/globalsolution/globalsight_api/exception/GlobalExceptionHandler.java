@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// ... other existing imports ...
+import br.com.fiap.globalsolution.globalsight_api.exception.UserAlreadyExistsException; // Add this import
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -124,6 +127,17 @@ public class GlobalExceptionHandler {
                 details
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex, jakarta.servlet.http.HttpServletRequest request) {
+        ApiErrorResponse errorResponse = new ApiErrorResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(), // Message from the exception itself
+                request.getRequestURI(),
+                null // Or provide specific details if needed
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     // Um handler genérico para outras exceções não tratadas especificamente

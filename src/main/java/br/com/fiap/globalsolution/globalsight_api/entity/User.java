@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    @Column(length = 100)
+    private String email;
+
+    @Column(length = 100)
+    private String completeName;
+
     // Getter adicionado manualmente
 
     @Getter

@@ -16,6 +16,15 @@ public class UserRegistrationDto {
     // Para produção, considere regras de complexidade de senha mais robustas.
     private String password;
 
+    @NotBlank(message = "Email cannot be blank")
+    @Size(max = 100, message = "Email must be up to 100 characters")
+    // Adicionar @Email para validação de formato de email
+    private String email;
+
+    @NotBlank(message = "Complete name cannot be blank")
+    @Size(max = 100, message = "Complete name must be up to 100 characters")
+    private String completeName;
+
     // Opcional: adicionar campo para roles se o usuário puder escolher ao se registrar,
     // ou atribuir um role padrão no service.
 }
