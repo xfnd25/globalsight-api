@@ -66,17 +66,23 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // API Stateless
                 .authorizeHttpRequests(authorize -> authorize
                         // Endpoints públicos
-                        .requestMatchers("/auth/**", "/8080/auth/register", "/8080/auth/login", "/auth/register", "/auth/login").permitAll()
-                        .requestMatchers("/api/swagger-ui/**", "/api/v1/api-docs/**", "/swagger-ui.html").permitAll()
-                        // .requestMatchers(HttpMethod.GET, "/api/disasters/history/**").permitAll() // Ex: Se histórico for público
-
-                        // Endpoints que requerem autenticação (ou roles específicas com @PreAuthorize nos controllers)
+                        .requestMatchers(
+                                "/auth/**",
+                                "/8080/auth/register",
+                                "/8080/auth/login",
+                                "/auth/register",
+                                "/auth/login",
+                                "/api/swagger-ui/**",
+                                "/api/v1/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        // Endpoints que requerem autenticação
                         .requestMatchers("/api/simulations/**").authenticated()
                         .requestMatchers("/api/drone/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("USER") // Exemplo: só ADMIN pode criar histórico
-                        .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("USER")   // Exemplo: só ADMIN pode atualizar histórico
-                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("USER")// Exemplo: só ADMIN pode deletar histórico
-                        .anyRequest().authenticated() // Todas as outras requisições precisam de autenticação
+                        .requestMatchers(HttpMethod.POST, "/api/history/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/history/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/history/**").hasRole("USER")
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
