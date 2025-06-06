@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // API Stateless
                 .authorizeHttpRequests(authorize -> authorize
                         // Endpoints públicos
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/8080/auth/register", "/8080/auth/login", "/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/api/swagger-ui/**", "/api/v1/api-docs/**", "/swagger-ui.html").permitAll()
                         // .requestMatchers(HttpMethod.GET, "/api/disasters/history/**").permitAll() // Ex: Se histórico for público
 
